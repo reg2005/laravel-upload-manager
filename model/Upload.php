@@ -78,17 +78,35 @@ class Upload extends Model
             return false;
         }
 
-        $explode = explode('.', $this->file_name);
-        $fileExtension = end($explode);
+        $explode = explode('.', $this->name);
+        $fileExtension = strtolower(end($explode));
         $tmpfname = tempnam("/tmp", "UL_IMAGE") . '.' . $fileExtension;
         $img = \Image::make($this->url);
-        $img->resize($size['w'], $size['h']);
+        if(array_get($size, 'type') == 'fit'){
+            $img->fit($size['w'], $size['h'], function ($constraint) {
+                $constraint->upsize();
+            });
+        }else{
+            $img->resize($size['w'], $size['h'], function ($constraint) {
+                $constraint->upsize();
+                $constraint->aspectRatio();
+            });
+        }
+
+
+        if(array_get($size, 'watermark')){
+            $img->insert(
+                storage_path('assets/watermark.png'),
+                'bottom-right', 30, 30
+            );
+        }
+
         $img->save($tmpfname);
 
         $manager = UploadManager::getInstance();
         $upload = $manager->upload($tmpfname);
         $upload->user_id = \Auth::user()->id;
-        $upload->watermarked = true;
+        $upload->watermarked = array_get($size, 'watermark', false);
         $upload->save();
 
         $this->children()->save($upload);
