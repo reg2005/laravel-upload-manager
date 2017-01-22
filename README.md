@@ -1,26 +1,38 @@
 # laravel-upload-manager
-通过API对文件进行“上传、验证、储存、管理”操作。
 Upload, validate, storage, manage by API for Laravel 5.1/5.2
 
-## 依赖 Requirement
+## Requirement
 
 1. Laravel 5.1/5.2
 
-## 安装 Install
+## Install
 
-1. composer require zgldh/laravel-upload-manager
-2. ```config/app.php```  ```'providers' => [ 'zgldh\UploadManager\UploadManagerServiceProvider']```
-3. php artisan vendor:publish --provider="zgldh\UploadManager\UploadManagerServiceProvider"
-4. php artisan migrate
-5. Done
+1. composer require reg2005/laravel-upload-manager
+2. ```config/app.php```
+```
+'providers' => [
+    'reg2005\UploadManager\UploadManagerServiceProvider',
+    Intervention\Image\ImageServiceProvider::class
+]
 
-## 用法 Usage
+...
 
-1. 上传一个文件 Upload and store a file.
+'aliases' => [
+    'Image' => Intervention\Image\Facades\Image::class
+]
+```
+3. php artisan vendor:publish --provider="reg2005\UploadManager\UploadManagerServiceProvider"
+4. php artisan vendor:publish --provider="Intervention\Image\ImageServiceProviderLaravel5"
+5. php artisan migrate
+6. Done
+
+## Usage
+
+1. Upload and store a file.
     
     ```php
      
-        use zgldh\UploadManager\UploadManager;
+        use reg2005\UploadManager\UploadManager;
         
         class UploadController extend Controller
         {
@@ -35,11 +47,11 @@ Upload, validate, storage, manage by API for Laravel 5.1/5.2
         }
     ```
  
-2. 从一个URL获取并保存文件 Fetch and store a file from a URL
+2. Fetch and store a file from a URL
     
     ```php
      
-        use zgldh\UploadManager\UploadManager;
+        use reg2005\UploadManager\UploadManager;
         
         class UploadController extend Controller
         {
@@ -54,12 +66,12 @@ Upload, validate, storage, manage by API for Laravel 5.1/5.2
         }
     ```
  
-3. 更新一个上传对象 Update a upload object
+3. Update a upload object
     
     ```php
      
         use App\Upload;
-        use zgldh\UploadManager\UploadManager;
+        use reg2005\UploadManager\UploadManager;
         
         class UploadController extend Controller
         {
@@ -80,12 +92,12 @@ Upload, validate, storage, manage by API for Laravel 5.1/5.2
         }
     ```
  
-4. 用从一个URL获取到的文件来更新一个上传对象 Update a upload object from a URL
+4. Update a upload object from a URL
     
     ```php
      
         use App\Upload;
-        use zgldh\UploadManager\UploadManager;
+        use reg2005\UploadManager\UploadManager;
         
         class UploadController extend Controller
         {
@@ -106,11 +118,11 @@ Upload, validate, storage, manage by API for Laravel 5.1/5.2
         }
     ```
     
-5. 数据验证 Validation
+5. Validation
     
     ```php
     
-        use zgldh\UploadManager\UploadManager;
+        use reg2005\UploadManager\UploadManager;
         
         class UploadController extend Controller
         {
@@ -135,11 +147,11 @@ Upload, validate, storage, manage by API for Laravel 5.1/5.2
         }
     ```
     
-6. 存到别的Disk里面 
+6. Disk 
     
     ```php
     
-        use zgldh\UploadManager\UploadManager;
+        use reg2005\UploadManager\UploadManager;
         
         class UploadController extend Controller
         {
@@ -149,7 +161,7 @@ Upload, validate, storage, manage by API for Laravel 5.1/5.2
                 $manager = UploadManager::getInstance();
                 $upload = $manager
                     ->withValidator('image')
-                    ->withDisk('qiniu')         // 储存到七牛磁盘里
+                    ->withDisk('selectel')         // 储存到七牛磁盘里
                     ->upload($file);
                 $upload->save();
                 return $upload;
@@ -157,11 +169,11 @@ Upload, validate, storage, manage by API for Laravel 5.1/5.2
         }
     ```
     
-7. 上传前修改``` $upload ``` 对象
+7. ``` $upload ``` 
     
     ```php
     
-        use zgldh\UploadManager\UploadManager;
+        use reg2005\UploadManager\UploadManager;
         
         class UploadController extend Controller
         {
@@ -171,11 +183,11 @@ Upload, validate, storage, manage by API for Laravel 5.1/5.2
                 $manager = UploadManager::getInstance();
                 $upload = $manager
                     ->withValidator('image')
-                    ->withDisk('localhost')         // 默认存到本地
+                    ->withDisk('localhost')
                     ->upload($file, function($upload){
                         if($upload->size > 1024*1024)
                         {
-                            $upload->disk = 'qiniu';// 超过1兆的文件都放到七牛里。
+                            $upload->disk = 'selectel';
                         }
                         return $upload;
                     });
@@ -185,43 +197,36 @@ Upload, validate, storage, manage by API for Laravel 5.1/5.2
         }
     ```
     
-## 配置 Configuration
+## Configuration
 
 1. ``` config/upload.php ```
 
-    请查看源文件注释
-
 2. ``` App\Upload ```
-
-    可以在里面写自己喜欢的函数
     
 3. ``` UploadStrategy.php ```
-
-    通常需要你亲自扩展一个出来。如：
     
     ```php
         
         <?php namespace App\Extensions;
         
-        use zgldh\UploadManager\UploadStrategy as BaseUploadStrategy;
-        use zgldh\UploadManager\UploadStrategyInterface;
+        use reg2005\UploadManager\UploadStrategy as BaseUploadStrategy;
+        use reg2005\UploadManager\UploadStrategyInterface;
         
         class UploadStrategy extends BaseUploadStrategy implements UploadStrategyInterface
         {
         
             /**
-             * 生成储存的相对路径
              * @param $filename
              * @return string
              */
             public function makeStorePath($filename)
             {
-                $path = 'i/' . $filename;
+                $path = 'uploads/' . $filename;
                 return $path;
             }
         
             /**
-             * 得到 disk localuploads 内上传的文件的URL
+             * disk localuploads
              * @param $path
              * @return string
              */
@@ -232,21 +237,21 @@ Upload, validate, storage, manage by API for Laravel 5.1/5.2
             }
         
             /**
-             * 得到 disk qiniu 内上传的文件的URL
+             * disk selectel
              * @param $path
              * @return string
              */
-            public function getQiniuUrl($path)
+            public function getselectelUrl($path)
             {
-                $url = 'http://' . trim(\Config::get('filesystems.disks.qiniu.domain'), '/') . '/' . trim($path, '/');
+                $url = 'http://' . trim(\Config::get('filesystems.disks.selectel.domain'), '/') . '/' . trim($path, '/');
                 return $url;
             }
         } 
     ```
     
-    然后在 ``` config/upload.php ``` 里面配置 ``` upload_strategy ``` 为你自己扩展的类即可。
+     ``` config/upload.php ``` 
+     ``` upload_strategy ```
     
-    
-待续
+  
 
     

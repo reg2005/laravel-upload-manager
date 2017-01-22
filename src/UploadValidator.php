@@ -1,4 +1,4 @@
-<?php namespace zgldh\UploadManager;
+<?php namespace reg2005\UploadManager;
 
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;

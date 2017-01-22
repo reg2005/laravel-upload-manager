@@ -1,4 +1,4 @@
-<?php namespace zgldh\UploadManager;
+<?php namespace reg2005\UploadManager;
 
 use SplFileInfo;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -11,6 +11,40 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class UploadStrategy implements UploadStrategyInterface
 {
+
+    /**
+     * 生成储存的相对路径
+     * @param $filename
+     * @return string
+     */
+    public function makeStorePath($filename)
+    {
+        $path = 'uploads/' . $filename;
+        return $path;
+    }
+
+    /**
+     * 得到 disk localuploads 内上传的文件的URL
+     * @param $path
+     * @return string
+     */
+    public function getLocaluploadsUrl($path)
+    {
+        $url = url('uploads/' . $path);
+        return $url;
+    }
+
+    /**
+     * 得到 disk qiniu 内上传的文件的URL
+     * @param $path
+     * @return string
+     */
+    public function getSelectelUrl($path)
+    {
+        $url = trim(\Config::get('filesystems.disks.selectel.domain'), '/') . '/' . trim($path, '/');
+        return $url;
+    }
+
     /**
      * 生成文件名
      * @param $file UploadedFile|SplFileInfo|string
@@ -29,16 +63,5 @@ class UploadStrategy implements UploadStrategyInterface
             throw new \RuntimeException(__METHOD__ . ' needs a UploadedFile|SplFileInfo|string instance or a file path string');
         }
         return $filename;
-    }
-
-    /**
-     * 生成储存的相对路径
-     * @param $filename
-     * @return string
-     */
-    public function makeStorePath($filename)
-    {
-        $path = 'uploads/' . $filename;
-        return $path;
     }
 }

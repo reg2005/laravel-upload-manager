@@ -1,4 +1,4 @@
-<?php namespace zgldh\UploadManager;
+<?php namespace reg2005\UploadManager;
 
 /**
  * Created by PhpStorm.
@@ -20,8 +20,8 @@ class UploadManagerServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('zgldh\UploadManager\UploadStrategyInterface', \Config::get('upload.upload_strategy'));
-        $this->app->singleton('upload-manager', 'zgldh\UploadManager\UploadManager');
+        $this->app->singleton('reg2005\UploadManager\UploadStrategyInterface', \Config::get('upload.upload_strategy'));
+        $this->app->singleton('upload-manager', 'reg2005\UploadManager\UploadManager');
 
         $this->mergeConfigFrom(
             __DIR__ . '/../config/upload.php', 'upload'

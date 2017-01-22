@@ -1,4 +1,4 @@
-<?php namespace zgldh\UploadManager;
+<?php namespace reg2005\UploadManager;
 
 /**
  * Created by PhpStorm.

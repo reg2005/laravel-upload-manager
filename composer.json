@@ -1,7 +1,8 @@
 {
-	"name": "zgldh/laravel-upload-manager",
+	"name": "reg2005/laravel-upload-manager",
 	"license": "MIT",
-	"description": "Upload, validate, storage, manage by API for Laravel 5.1/5.2",
+	"version": "1.0.2",
+	"description": "Upload, validate, storage, manage by API for Laravel 5.1/5.2/5.3/5.4",
 	"keywords": [
 		"laravel",
 		"upload",
@@ -12,16 +13,22 @@
 	],
 	"authors": [
 		{
+			"name": "reg2005",
+			"email": "cmp08@ya.ru"
+		},
+		{
 			"name": "zgldh",
 			"email": "zgldh@hotmail.com"
 		}
 	],
 	"require": {
+		"kalnoy/nestedset": "^4",
+		"intervention/image": "^2.3",
 		"laravel/framework": "^5.1"
 	},
 	"autoload": {
 		"psr-4": {
-			"zgldh\\UploadManager\\": "src/"
+			"reg2005\\UploadManager\\": "src/"
 		}
 	}
 }

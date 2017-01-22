@@ -1,4 +1,4 @@
-<?php namespace zgldh\UploadManager;
+<?php namespace reg2005\UploadManager;
 
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -22,7 +22,7 @@ class UploadManager
     private $diskName = null;
 
     /**
-     * @var array zgldh\UploadManager\Validators\Base
+     * @var array reg2005\UploadManager\Validators\Base
      */
     private $validatorGroups = null;
 
@@ -47,7 +47,7 @@ class UploadManager
      */
     public static function getStrategy()
     {
-        return \App::make('zgldh\UploadManager\UploadStrategyInterface');
+        return \App::make('reg2005\UploadManager\UploadStrategyInterface');
     }
 
     /**
@@ -112,13 +112,19 @@ class UploadManager
             $newName = $this->strategy->makeFileName($file);
             $path = $this->strategy->makeStorePath($newName);
 
-
             $content = file_get_contents($uploadedFilePath);
             UploadValidator::validate($content, $this->validatorGroups);
 
             $upload->path = $path;
+            $upload->type = $this->getFileType($uploadedFilePath);
             $upload->disk = $this->diskName;
             $upload->size = strlen($content);
+
+            if($upload->type == 'image'){
+                list($width, $height) = getimagesize($uploadedFilePath);
+                $upload->width = $width;
+                $upload->height = $height;
+            }
 
             if (is_callable($preCallback)) {
                 $upload = $preCallback($upload);
@@ -137,6 +143,18 @@ class UploadManager
             return false;
         }
         return $upload;
+    }
+
+    public function getFileType($uploadedFilePath)
+    {
+        $tmpfname = tempnam("/tmp", "UL_IMAGE");
+        $img = file_get_contents($uploadedFilePath);
+        file_put_contents($tmpfname, $img);
+        $fileType = \File::mimeType($tmpfname);
+        $fileType = explode('/', $fileType);
+        $fileType = array_first($fileType);
+
+        return $fileType;
     }
 
     private function newUploadModel()
